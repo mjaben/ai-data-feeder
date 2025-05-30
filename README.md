@@ -1,2 +1,8 @@
-# ai-data-feeder
-Custom WP plugin to manage and organize AI-readable case data. It will be used to feed data to an AI Model.
+# AI Data Feeder
+
+A custom WordPress plugin that allows admins to feed structured, AI-readable data for use with AI chatbots (like WpEazy AI).
+
+## Features
+- Custom Post Type for storing AI knowledge chunks
+- WordPress editor support (text + images)
+- Clean interface for organizing case data
