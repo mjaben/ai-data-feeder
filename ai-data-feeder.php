@@ -63,3 +63,84 @@ function adf_register_post_type() {
     register_post_type('ai-data-feeder', $args);
 }
 add_action('init', 'adf_register_post_type');
+
+
+// Add meta boxes to AI Knowledge Chunk
+function adf_add_meta_boxes() {
+    add_meta_box(
+        'adf_case_id',
+        'Case ID',
+        'adf_case_id_callback',
+        'ai-data-feeder',
+        'side',
+        'default'
+    );
+
+    add_meta_box(
+        'adf_confidence_score',
+        'Confidence Score',
+        'adf_confidence_score_callback',
+        'ai-data-feeder',
+        'side',
+        'default'
+    );
+    
+}
+add_action('add_meta_boxes', 'adf_add_meta_boxes');
+
+// HTML output for the Case ID field
+function adf_case_id_callback($post) {
+    $case_id = get_post_meta($post->ID, '_adf_case_id', true);
+    echo '<label for="adf_case_id">Enter unique Case ID:</label>';
+    echo '<input type="text" id="adf_case_id" name="adf_case_id" value="' . esc_attr($case_id) . '" style="width:100%;" />';
+}
+
+function adf_confidence_score_callback($post) {
+    $value = get_post_meta($post->ID, '_adf_confidence_score', true);
+    ?>
+    <label for="adf_confidence_score">Select Confidence Level:</label>
+    <select name="adf_confidence_score" id="adf_confidence_score" style="width:100%;">
+        <option value="">-- Select --</option>
+        <option value="High" <?php selected($value, 'High'); ?>>High</option>
+        <option value="Medium" <?php selected($value, 'Medium'); ?>>Medium</option>
+        <option value="Low" <?php selected($value, 'Low'); ?>>Low</option>
+    </select>
+    <?php
+}
+
+
+// Save Case ID when post is saved
+function adf_save_meta_fields($post_id) {
+    if (array_key_exists('adf_case_id', $_POST)) {
+        update_post_meta(
+            $post_id,
+            '_adf_case_id',
+            sanitize_text_field($_POST['adf_case_id'])
+        );
+    }
+
+    if (array_key_exists('adf_confidence_score', $_POST)) {
+        update_post_meta(
+            $post_id,
+            '_adf_confidence_score',
+            sanitize_text_field($_POST['adf_confidence_score'])
+        );
+    }
+    
+}
+add_action('save_post', 'adf_save_meta_fields');
+
+function adf_register_taxonomies() {
+    register_taxonomy(
+        'ai_category',
+        'ai-data-feeder',
+        array(
+            'label' => 'AI Categories',
+            'hierarchical' => true,
+            'show_ui' => true,
+            'show_in_rest' => true,
+            'rewrite' => array('slug' => 'ai-category'),
+        )
+    );
+}
+add_action('init', 'adf_register_taxonomies');
